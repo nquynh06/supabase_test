@@ -1,0 +1,27 @@
+name: Keep Supabase Database Awake
+
+on:
+  schedule:
+    - cron: '0 2 * * *' 
+  workflow_dispatch:
+
+jobs:
+  keep-awake:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send request to awake Supabase
+        run: |
+          echo "Sending request to keep Supabase awake..."
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/" \
+            -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_KEY }}" \
+            -H "Content-Type: application/json" \
+            || true)
+
+          if [ "$RESPONSE" = "200" ]; then
+            echo "Supabase DB is awake (responded OK)"
+          else
+            echo "Supabase returned HTTP $RESPONSE"
+          fi
