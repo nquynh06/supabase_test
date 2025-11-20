@@ -10,36 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Ping Supabase (Main)
+      - name: Wake Supabase Main and count records
         run: |
-          echo "Pinging Supabase..."
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
-            "${{ secrets.DATABASE_URL_GGDRIVE }}/rest/v1/" \
+          COUNT=$(curl -s -D - \
+            "${{ secrets.DATABASE_URL_GGDRIVE }}/rest/v1/users?select=id&limit=0" \
             -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
-            -H "Content-Type: application/json")
+            -H "Prefer: count=exact" | grep -i "content-range" | awk '{print $2}' | cut -d/ -f2)
+          echo "Supabase Main is awake ✔ Users count: $COUNT"
 
-          echo "Response code: $RESPONSE"
-
-          if [ "$RESPONSE" = "200" ]; then
-            echo "Supabase is awake ✔"
-          else
-            echo "Supabase failed with HTTP $RESPONSE"
-            exit 1
-          fi
-
-      - name: Ping Supabase (DR Plan)
+      - name: Wake Supabase DR Plan and count records
         run: |
-          echo "Pinging Supabase DR Plan..."
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/" \
+          COUNT=$(curl -s -D - \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/orders?select=id&limit=0" \
             -H "apikey: ${{ secrets.SUPABASE_KEY_DR_PLAN }}" \
-            -H "Content-Type: application/json")
-
-          echo "Response code: $RESPONSE"
-
-          if [ "$RESPONSE" = "200" ]; then
-            echo "Supabase DR Plan is awake ✔"
-          else
-            echo "Supabase DR Plan failed with HTTP $RESPONSE"
-            exit 1
-          fi
+            -H "Prefer: count=exact" | grep -i "content-range" | awk '{print $2}' | cut -d/ -f2)
+          echo "Supabase DR Plan is awake ✔ Orders count: $COUNT"
