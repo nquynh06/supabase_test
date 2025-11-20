@@ -13,7 +13,7 @@ jobs:
       - name: Wake Supabase Main and count records
         run: |
           COUNT=$(curl -s -D - \
-            "${{ secrets.DATABASE_URL_GGDRIVE }}/rest/v1/users?select=id&limit=0" \
+            "${{ secrets.DATABASE_URL_GGDRIVE }}/rest/v1/courses?select=id&limit=0" \
             -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
             -H "Prefer: count=exact" | grep -i "content-range" | awk '{print $2}' | cut -d/ -f2)
           echo "Supabase Main is awake ✔ Users count: $COUNT"
@@ -21,7 +21,7 @@ jobs:
       - name: Wake Supabase DR Plan and count records
         run: |
           COUNT=$(curl -s -D - \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/orders?select=id&limit=0" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/svuit?select=id&limit=0" \
             -H "apikey: ${{ secrets.SUPABASE_KEY_DR_PLAN }}" \
             -H "Prefer: count=exact" | grep -i "content-range" | awk '{print $2}' | cut -d/ -f2)
           echo "Supabase DR Plan is awake ✔ Orders count: $COUNT"
