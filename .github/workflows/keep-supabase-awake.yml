@@ -16,7 +16,6 @@ jobs:
           RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
             "${{ secrets.DATABASE_URL_GGDRIVE }}/rest/v1/" \
             -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_KEY }}" \
             -H "Content-Type: application/json")
 
           echo "Response code: $RESPONSE"
@@ -34,7 +33,6 @@ jobs:
           RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/" \
             -H "apikey: ${{ secrets.SUPABASE_KEY_DR_PLAN }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_KEY_DR_PLAN }}" \
             -H "Content-Type: application/json")
 
           echo "Response code: $RESPONSE"
