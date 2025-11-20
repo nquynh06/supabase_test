@@ -25,3 +25,19 @@ jobs:
           else
             echo "Supabase returned HTTP $RESPONSE"
           fi
+
+      - name: Send request to awake Supabase_DR_Plan
+        run: |
+          echo "Sending request to keep Supabase awake..."
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/" \
+            -H "apikey: ${{ secrets.SUPABASE_KEY_DR_PLAN }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_KEY_DR_PLAN }}" \
+            -H "Content-Type: application/json" \
+            || true)
+
+          if [ "$RESPONSE" = "200" ]; then
+            echo "Supabase_DR_Plan DB is awake (responded OK)"
+          else
+            echo "Supabase returned HTTP $RESPONSE"
+          fi
