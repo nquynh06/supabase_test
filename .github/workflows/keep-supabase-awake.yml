@@ -2,7 +2,7 @@ name: Keep Supabase Database Awake
 
 on:
   schedule:
-    - cron: '0 2 * * *' 
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,34 +10,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Send request to awake Supabase
+      - name: Ping Supabase (Main)
         run: |
-          echo "Sending request to keep Supabase awake..."
+          echo "Pinging Supabase..."
           RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/" \
             -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_KEY }}" \
-            -H "Content-Type: application/json" \
-            || true)
+            -H "Content-Type: application/json")
+
+          echo "Response code: $RESPONSE"
 
           if [ "$RESPONSE" = "200" ]; then
-            echo "Supabase DB is awake (responded OK)"
+            echo "Supabase is awake ✔"
           else
-            echo "Supabase returned HTTP $RESPONSE"
+            echo "Supabase failed with HTTP $RESPONSE"
+            exit 1
           fi
 
-      - name: Send request to awake Supabase_DR_Plan
+      - name: Ping Supabase (DR Plan)
         run: |
-          echo "Sending request to keep Supabase awake..."
+          echo "Pinging Supabase DR Plan..."
           RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/" \
+            "${{ secrets.SUPABASE_URL_DR }}/rest/v1/" \
             -H "apikey: ${{ secrets.SUPABASE_KEY_DR_PLAN }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_KEY_DR_PLAN }}" \
-            -H "Content-Type: application/json" \
-            || true)
+            -H "Content-Type: application/json")
+
+          echo "Response code: $RESPONSE"
 
           if [ "$RESPONSE" = "200" ]; then
-            echo "Supabase_DR_Plan DB is awake (responded OK)"
+            echo "Supabase DR Plan is awake ✔"
           else
-            echo "Supabase returned HTTP $RESPONSE"
+            echo "Supabase DR Plan failed with HTTP $RESPONSE"
+            exit 1
           fi
